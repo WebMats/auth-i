@@ -1,6 +1,7 @@
 const express = require('express');
 const helmet = require('helmet');
 const knex = require('knex');
+const cors = require('cors');
 const knexConfig = require('./knexfile');
 const bcrypt = require('bcryptjs');
 const app = express();
@@ -9,6 +10,7 @@ const userDB = knex(knexConfig.development)
 const authGuard = require('./middleware/auth');
 app.use(express.json())
 app.use(helmet());
+app.use(cors());
 
 app.use('/api/restricted/', [authGuard]) 
 
@@ -29,12 +31,13 @@ app.post('/api/register', (req, res, next) => {
 app.post('/api/login', async (req, res, next) => {
     const { email, password } = req.body;
     if (!email || !password) {
-        return res.status(404).json({errorMessage: "Please provide both an email and a password to create a new user"});
+        return res.status(404).json({errorMessage: "Please provide both an email and a password for user"});
     }
-    const { id, hash } = await userDB('users').where({email}).first();
-    if (!hash) {
-        return res.status({errorMessage: "Could not authenticate user."})
+    const user = await userDB('users').where({email}).first();
+    if (!user) {
+        return res.status(404).json({errorMessage: "Could not authenticate user."})
     }
+    const { id, hash } = user;
     bcrypt.compare(password, hash).then(isMatch => {
         if (isMatch) {
             res.status(201).json({id, email, status: 'Logged in'}) 
@@ -65,4 +68,4 @@ app.get('/api/users', authGuard, async (req, res, next)=> {
 })
 
 
-app.listen(4200, () => {console.log('Listening at port 4200...')})
+app.listen(4400, () => {console.log('Listening at port 4400...')})

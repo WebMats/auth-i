@@ -5,7 +5,7 @@ module.exports = (req, res, next) => {
         return next();
     }
     const email = authHeader.split(' ')[1];
-    if (!email || email === '') {
+    if (!email || email === '' || email == 'null') {
         req.isAuth = false;
         return next();
     }
