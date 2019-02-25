@@ -21,8 +21,13 @@ app.post('/api/register', (req, res, next) => {
     }
     bcrypt.hash(password, 11).then( async (hash) => {
         const newUser = {email, hash}
-        const [id] = await userDB('users').insert(newUser);
-        res.status(201).json(id);
+        try {
+            const [id] = await userDB('users').insert(newUser);
+            res.status(201).json({id, email, status: 'Logged in'});
+        } catch (err) {
+            console.log(err)
+            res.status(500).json({errorMessage: "Could not register the user."})
+        }
     }).catch(err => {
        console.log(err)
        res.status(500).json({errorMessage: "Could not register the user."})

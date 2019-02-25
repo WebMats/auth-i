@@ -23,7 +23,6 @@ export default class Users extends Component {
                 'Authorization': `bearer ${email}`
             }
         }).then(res => res.json()).then(result => {
-            console.log(result)
             if (result.errorMessage) {
                 console.log(result.errorMessage)
                 return;

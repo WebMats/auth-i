@@ -14,14 +14,13 @@ export default class AuthForm extends Component {
             this.props.history.push('/users', {email})
         }
     }
-    submitForm = (e) => {
-        e.preventDefault()
+    submitForm = (path) => {
         const credentials = {
             email: this.emailRef.current.value,
             password: this.passwordRef.current.value
         }
         if (!credentials.email || !credentials.password) return;
-        fetch('http://localhost:4400/api/login', {
+        fetch(`http://localhost:4400${path}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -41,7 +40,7 @@ export default class AuthForm extends Component {
   render() {
     return (
       <div>
-        <form onSubmit={this.submitForm}>
+        <form>
             <div>
                 <label htmlFor="email">Email</label>
                 <input placeholder="Email"  ref={this.emailRef} />
@@ -50,7 +49,8 @@ export default class AuthForm extends Component {
                 <label htmlFor="password">Password</label>
                 <input placeholder="Password" ref={this.passwordRef} />
             </div>
-            <button type="submit"> Login</button>
+            <button type="button" onClick={() => this.submitForm('/api/login')}>Login</button>
+            <button type="button" onClick={() => this.submitForm('/api/register')}>Sign Up</button>
         </form>
       </div>
     )
