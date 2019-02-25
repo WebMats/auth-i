@@ -6,7 +6,7 @@ const bcrypt = require('bcryptjs');
 const app = express();
 
 const userDB = knex(knexConfig.development)
-
+const authGuard = require('./middleware/auth');
 app.use(express.json())
 app.use(helmet());
 
@@ -44,7 +44,10 @@ app.post('/api/login', async (req, res, next) => {
         res.status(500).json({errorMessage: "Could not authenticate user."})
     });
 })
-app.get('/api/users', async (req, res, next)=> {
+app.get('/api/users', authGuard, async (req, res, next)=> {
+    if (!req.isAuth) {
+        return res.status(500).json({errorMessage: 'You must be logged in to access this endpoint'})
+    }
     try {
         const users = await userDB('users');
         if (!users || !users.length) {
