@@ -10,6 +10,8 @@ const authGuard = require('./middleware/auth');
 app.use(express.json())
 app.use(helmet());
 
+app.use('/api/restricted/', [authGuard]) 
+
 app.post('/api/register', (req, res, next) => {
     const { email, password } = req.body;
     if (!email || !password) {
@@ -44,6 +46,7 @@ app.post('/api/login', async (req, res, next) => {
         res.status(500).json({errorMessage: "Could not authenticate user."})
     });
 })
+
 app.get('/api/users', authGuard, async (req, res, next)=> {
     if (!req.isAuth) {
         return res.status(500).json({errorMessage: 'You must be logged in to access this endpoint'})
