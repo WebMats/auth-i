@@ -1,0 +1,6 @@
+{
+    "env": {
+        "COOKIE_SECRET": "chocolate-chips"
+    },
+    "verbose": true
+}
