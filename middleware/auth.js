@@ -1,15 +1,15 @@
 module.exports = (req, res, next) => {
-    const authHeader = req.get('Authorization');
-    if (!authHeader) {
+    const session = req.session;
+    if (!session) {
         req.isAuth = false;
         return next();
     }
-    const email = authHeader.split(' ')[1];
-    if (!email || email === '' || email == 'null') {
+    const user = req.session.user;
+    if (!user || user === '' || user == 'null') {
         req.isAuth = false;
         return next();
     }
     req.isAuth = true;
-    req.email = email;
+    req.user = user;
     next();
 }

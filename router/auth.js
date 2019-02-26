@@ -34,6 +34,7 @@ router.post('/login', async (req, res, next) => {
     const { id, hash } = user;
     bcrypt.compare(password, hash).then(isMatch => {
         if (isMatch) {
+            req.session.user = user.email
             res.status(201).json({id, email, status: 'Logged in'}) 
         } else {
             res.status(404).json({errorMessage: "Could not authenticate user."})
