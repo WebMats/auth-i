@@ -2,6 +2,7 @@ const express = require('express');
 const helmet = require('helmet');
 const cors = require('cors');
 const session = require('express-session');
+const passport = require('passport');
 
 const sessionConfig = {
     name: 'lambda-authentication',
@@ -10,13 +11,15 @@ const sessionConfig = {
     resave: false,
     saveUninitialized: false
 }
-
+require('./services/passport');
 const app = express();
 const authGuard = require('./middleware/auth');
 app.use(express.json())
 app.use(helmet());
 app.use(cors());
 app.use(session(sessionConfig));
+app.use(passport.initialize());
+app.use(passport.session());
 
 const userRouter = require('./router/user');
 const authRouter = require('./router/auth');

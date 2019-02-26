@@ -4,7 +4,7 @@ module.exports = (req, res, next) => {
         req.isAuth = false;
         return next();
     }
-    const user = req.session.user;
+    const user = req.user;
     if (!user || user === '' || user == 'null') {
         req.isAuth = false;
         return next();
