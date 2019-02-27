@@ -19,19 +19,14 @@ passport.serializeUser(function(email, done) {
 
   });
 
-
 passport.use('local.signin', new LocalStrategy({
     usernameField: 'email',
     passwordField: 'password',
     passReqToCallback: true
 }, function(req, email, password, done) {
     userDB('users').where({email}).first().asCallback(function(err, user) {
-        if (err) {
-            return done(err, false);
-        }
-        if (!user) {
-            return done(null, false);
-        }
+        if (err) return done(err, false);
+        if (!user) return done(null, false);
         bcrypt.compare(password, user.hash).then(isMatch => {
             if (isMatch) {
                 return done(null, user.email)
@@ -39,5 +34,28 @@ passport.use('local.signin', new LocalStrategy({
                 done(null, false)
             }
         })
+    });
+}))
+passport.use('local.signup', new LocalStrategy({
+    usernameField: 'email',
+    passwordField: 'password',
+    passReqToCallback: true
+}, function(req, email, password, done) {
+    userDB('users').where({email}).first().asCallback(function(err, user) {
+        if (err) return done(err, false);
+        if (user) return done(null, false);
+        bcrypt.hash(password, 11).then( async (hash) => {
+            const newUser = {email, hash}
+            try {
+                const [id] = await userDB('users').insert(newUser);
+                done(null, email)
+            } catch (err) {
+                console.log(err)
+                done({errorMessage: "Could not register the user."}, false)
+            }
+        }).catch(err => {
+           console.log(err)
+           done({errorMessage: "Could not register the user."}, false)
+        });
     });
 }))
