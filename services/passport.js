@@ -2,6 +2,7 @@ const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
 const userDB = require('../data/dbConfig');
 const bcrypt = require('bcryptjs');
+const checkValidity = require('../services/authValidation');
 
 
 passport.serializeUser(function(email, done) {
@@ -24,6 +25,9 @@ passport.use('local.signin', new LocalStrategy({
     passwordField: 'password',
     passReqToCallback: true
 }, function(req, email, password, done) {
+    if (!checkValidity(email, {required: true, isEmail: true }) || !checkValidity(password, {required: true})) {
+        return done("Please provide valid email and password", false)
+    }
     userDB('users').where({email}).first().asCallback(function(err, user) {
         if (err) return done(err, false);
         if (!user) return done(null, false);
@@ -41,6 +45,9 @@ passport.use('local.signup', new LocalStrategy({
     passwordField: 'password',
     passReqToCallback: true
 }, function(req, email, password, done) {
+    if (!checkValidity(email, {required: true, isEmail: true }) || !checkValidity(password, {required: true})) {
+        return done("Please provide valid email and password", false)
+    }
     userDB('users').where({email}).first().asCallback(function(err, user) {
         if (err) return done(err, false);
         if (user) return done(null, false);
@@ -51,11 +58,11 @@ passport.use('local.signup', new LocalStrategy({
                 done(null, email)
             } catch (err) {
                 console.log(err)
-                done({errorMessage: "Could not register the user."}, false)
+                done("Could not register the user.", false)
             }
         }).catch(err => {
            console.log(err)
-           done({errorMessage: "Could not register the user."}, false)
+           done("Could not register the user.", false)
         });
     });
 }))
